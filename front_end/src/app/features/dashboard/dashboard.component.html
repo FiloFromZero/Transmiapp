@@ -1,0 +1,180 @@
+<div class="dashboard">
+
+  <!-- ══ HEADER ══════════════════════════════════════════════ -->
+  <header class="dash-header">
+    <div class="dash-header__brand">
+      <div class="brand-icon">🚌</div>
+      <div>
+        <h1 class="brand-title">TransmiApp</h1>
+        <p class="brand-sub">Bogotá en movimiento</p>
+      </div>
+    </div>
+    <nav class="dash-header__nav">
+      <a routerLink="/tracking" class="nav-btn nav-btn--icon" aria-label="Mapa en vivo" title="Mapa en vivo">
+        <span class="nav-icon">🗺️</span>
+      </a>
+      <a routerLink="/novedades" class="nav-btn nav-btn--icon nav-btn--alert" aria-label="Novedades"
+        title="Novedades">
+        <span class="nav-icon">⚠️</span>
+        @if (totalIncidentes() > 0) {
+          <span class="badge">{{ totalIncidentes() }}</span>
+        }
+      </a>
+    </nav>
+  </header>
+
+  <!-- ══ KPI STRIP ═══════════════════════════════════════════ -->
+  <section class="kpi-strip" aria-label="Indicadores del sistema">
+    <div class="kpi-card">
+      <span class="kpi-icon">🛣️</span>
+      <div class="kpi-body">
+        <span class="kpi-value">{{ rutasActivas() }}</span>
+        <span class="kpi-label">Rutas activas</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-icon">🚌</span>
+      <div class="kpi-body">
+        <span class="kpi-value">{{ totalVehiculos() }}</span>
+        <span class="kpi-label">Buses en operación</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-card--warn">
+      <span class="kpi-icon">⚠️</span>
+      <div class="kpi-body">
+        <span class="kpi-value">{{ totalIncidentes() }}</span>
+        <span class="kpi-label">Incidentes activos</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ BUSCADOR & FILTROS ═══════════════════════════════════ -->
+  <section class="search-section">
+    <label class="search-box" for="ruta-search">
+      <span class="search-icon">🔍</span>
+      <input
+        id="ruta-search"
+        type="search"
+        class="search-input"
+        placeholder="Buscar ruta o código..."
+        [value]="busqueda()"
+        (input)="onBusqueda($event)"
+        autocomplete="off"
+      />
+    </label>
+    <div class="filter-chips" role="group" aria-label="Filtrar por tipo de ruta">
+      @for (f of [
+        {key:'todas', label:'Todas'},
+        {key:'troncal', label:'Troncal'},
+        {key:'sitp', label:'SITP'},
+        {key:'alimentadora', label:'Alimentadora'},
+        {key:'cable', label:'Cable'}
+      ]; track f.key) {
+        <button
+          class="chip"
+          [class.chip--active]="filtroActivo() === f.key"
+          (click)="setFiltro(f.key)"
+          type="button"
+        >{{ f.label }}</button>
+      }
+    </div>
+  </section>
+
+  <!-- ══ TARJETAS DE RUTAS ════════════════════════════════════ -->
+  <main class="routes-grid" aria-label="Lista de rutas">
+    @if (resumenFiltrado().length === 0) {
+      <div class="empty-state">
+        <p class="empty-icon">🚏</p>
+        <p class="empty-text">No hay rutas que coincidan con tu búsqueda.</p>
+      </div>
+    }
+
+    @for (item of resumenFiltrado(); track item.ruta.id) {
+      <article class="route-card" [style.--ruta-color]="item.ruta.color">
+        <!-- Franja de color de la ruta -->
+        <div class="route-card__stripe"></div>
+
+        <div class="route-card__body">
+          <!-- Código + estado -->
+          <div class="route-card__top">
+            <div class="route-badge" [style.background]="item.ruta.color">{{ item.ruta.codigo }}</div>
+            <span
+              class="status-dot"
+              [style.background]="getColorEstado(item.ruta.estado)"
+              [title]="getLabelEstado(item.ruta.estado)"
+            ></span>
+            <span class="status-label">{{ getLabelEstado(item.ruta.estado) }}</span>
+          </div>
+
+          <!-- Nombre y trayecto -->
+          <h2 class="route-name">{{ item.ruta.nombre }}</h2>
+          <p class="route-path">
+            <span class="path-dot path-dot--start"></span>
+            {{ item.ruta.origen }}
+            <span class="path-arrow">→</span>
+            {{ item.ruta.destino }}
+            <span class="path-dot path-dot--end"></span>
+          </p>
+
+          <!-- Stats -->
+          <div class="route-stats">
+            <div class="stat-item">
+              <span class="stat-icon">🚌</span>
+              <span class="stat-val">{{ item.vehiculosActivos }}</span>
+              <span class="stat-lbl">buses activos</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-icon">⏱️</span>
+              <span class="stat-val">{{ item.tiempoProximoBus | number:'1.0-0' }} min</span>
+              <span class="stat-lbl">próximo bus</span>
+            </div>
+            <div class="stat-item" [class.stat-item--warn]="item.incidentesActivos > 0">
+              <span class="stat-icon">⚠️</span>
+              <span class="stat-val">{{ item.incidentesActivos }}</span>
+              <span class="stat-lbl">incidentes</span>
+            </div>
+          </div>
+
+          <!-- Barra de ocupación -->
+          <div class="ocupacion-bar" role="progressbar"
+            [attr.aria-valuenow]="getOcupacion(item.ruta.id)"
+            aria-valuemin="0" aria-valuemax="100">
+            <div class="ocupacion-bar__fill"
+              [style.width.%]="getOcupacion(item.ruta.id)"
+              [class.ocupacion-bar__fill--alto]="getOcupacion(item.ruta.id) > 70"
+            ></div>
+            <span class="ocupacion-label">Ocupación {{ getOcupacion(item.ruta.id) }}%</span>
+          </div>
+
+          <!-- Acciones -->
+          <div class="route-card__actions">
+            <a [routerLink]="['/tracking']" [queryParams]="{ruta: item.ruta.id}"
+              class="btn btn--primary">
+              📍 Ver en mapa
+            </a>
+            <a [routerLink]="['/novedades']" [queryParams]="{ruta: item.ruta.id}"
+              class="btn btn--ghost">
+              📋 Novedades
+            </a>
+          </div>
+        </div>
+      </article>
+    }
+  </main>
+
+  <!-- ══ BOTTOM NAV ═══════════════════════════════════════════ -->
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">🏠</span>
+      <span class="bnav-label">Inicio</span>
+    </a>
+    <a routerLink="/tracking" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">🗺️</span>
+      <span class="bnav-label">Mapa</span>
+    </a>
+    <a routerLink="/novedades" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">📢</span>
+      <span class="bnav-label">Novedades</span>
+    </a>
+  </nav>
+</div>

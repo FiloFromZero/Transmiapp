@@ -1,0 +1,224 @@
+<div class="novedades">
+  <!-- ══ HEADER ══════════════════════════════════════════ -->
+  <header class="nov-header">
+    <a routerLink="/dashboard" class="back-btn" aria-label="Volver">←</a>
+    <h1 class="nov-title">📢 Novedades</h1>
+    <button class="report-fab" (click)="toggleFormulario()" type="button"
+      [attr.aria-expanded]="mostrarFormulario()"
+      [attr.aria-label]="mostrarFormulario() ? 'Cancelar reporte' : 'Reportar incidente'">
+      {{ mostrarFormulario() ? '✕' : '+' }}
+    </button>
+  </header>
+
+  <!-- ══ FORMULARIO DE REPORTE ═══════════════════════════ -->
+  @if (mostrarFormulario()) {
+    <section class="report-form-wrapper" aria-live="polite">
+      <form class="report-form" [formGroup]="form" (ngSubmit)="submitIncidente()" novalidate>
+
+        <!-- ÉXITO -->
+        @if (exitoEnvio()) {
+          <div class="success-banner" role="alert" aria-live="assertive">
+            <span class="success-icon">✅</span>
+            <div>
+              <strong>¡Novedad reportada!</strong>
+              <p>Gracias por contribuir a mejorar el servicio.</p>
+            </div>
+          </div>
+        }
+
+        <h2 class="form-title">Reportar Novedad</h2>
+
+        <!-- Tipo -->
+        <fieldset class="form-fieldset">
+          <legend class="form-label">Tipo de incidente</legend>
+          <div class="tipo-grid">
+            @for (t of TIPOS; track t.value) {
+              <label class="tipo-card" [class.tipo-card--active]="form.value.tipo === t.value">
+                <input type="radio" formControlName="tipo" [value]="t.value" hidden>
+                <span class="tipo-icon">{{ t.icon }}</span>
+                <span class="tipo-label">{{ t.label }}</span>
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <!-- Severidad -->
+        <div class="form-group">
+          <label class="form-label" for="sev-select">Severidad</label>
+          <select id="sev-select" class="form-select" formControlName="severidad">
+            @for (s of SEVERIDADES; track s.value) {
+              <option [value]="s.value">{{ s.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Título -->
+        <div class="form-group">
+          <label class="form-label" for="titulo-input">Título</label>
+          <input
+            id="titulo-input"
+            type="text"
+            class="form-input"
+            [class.form-input--error]="form.controls.titulo.invalid && form.controls.titulo.touched"
+            placeholder="ej. Accidente en Calle 80"
+            formControlName="titulo"
+            autocomplete="off"
+            maxlength="80"
+          >
+          @if (form.controls.titulo.invalid && form.controls.titulo.touched) {
+            <span class="form-error">Ingresa un título de al menos 5 caracteres.</span>
+          }
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label class="form-label" for="desc-input">Descripción</label>
+          <textarea
+            id="desc-input"
+            class="form-textarea"
+            [class.form-input--error]="form.controls.descripcion.invalid && form.controls.descripcion.touched"
+            placeholder="Describe brevemente lo que está ocurriendo…"
+            formControlName="descripcion"
+            rows="3"
+            maxlength="300"
+          ></textarea>
+          @if (form.controls.descripcion.invalid && form.controls.descripcion.touched) {
+            <span class="form-error">Describe el incidente con al menos 10 caracteres.</span>
+          }
+        </div>
+
+        <!-- Rutas afectadas -->
+        <div class="form-group">
+          <span class="form-label">Rutas afectadas (opcional)</span>
+          <div class="rutas-chips">
+            @for (r of rutas(); track r.id) {
+              <button type="button" class="ruta-chip"
+                [class.ruta-chip--active]="(form.value.rutasAfectadas ?? []).includes(r.id)"
+                [style.--c]="r.color"
+                (click)="toggleRutaAfectada(r.id)">
+                {{ r.codigo }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button type="button" class="btn btn--ghost" (click)="toggleFormulario()">Cancelar</button>
+          <button type="submit" class="btn btn--primary" [disabled]="enviando()">
+            @if (enviando()) { <span class="spinner">⏳</span> }
+            {{ enviando() ? 'Enviando…' : '📤 Enviar reporte' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <!-- ══ FILTROS / COUNTERS ═══════════════════════════════ -->
+  <section class="filter-bar">
+    <button class="filt-btn" [class.filt-btn--active]="filtro() === 'todos'"
+      (click)="setFiltro('todos')" type="button">
+      Todos <span class="filt-count">{{ incidentes().length }}</span>
+    </button>
+    <button class="filt-btn filt-btn--activos" [class.filt-btn--active]="filtro() === 'activos'"
+      (click)="setFiltro('activos')" type="button">
+      Activos <span class="filt-count">{{ totalActivos() }}</span>
+    </button>
+    <button class="filt-btn filt-btn--resueltos" [class.filt-btn--active]="filtro() === 'resueltos'"
+      (click)="setFiltro('resueltos')" type="button">
+      Resueltos <span class="filt-count">{{ totalResueltos() }}</span>
+    </button>
+  </section>
+
+  <!-- ══ LISTA DE INCIDENTES ══════════════════════════════ -->
+  <main class="incidents-list" aria-label="Lista de novedades" aria-live="polite">
+    @if (incidentesFiltrados().length === 0) {
+      <div class="empty-state">
+        <p class="empty-icon">✅</p>
+        <p class="empty-text">Sin incidentes reportados en esta categoría.</p>
+      </div>
+    }
+
+    @for (inc of incidentesFiltrados(); track inc.id) {
+      <article class="incident-card"
+        [class.incident-card--activo]="inc.activo"
+        [class.incident-card--expanded]="incidenteExpandido() === inc.id"
+        [class.incident-card--critica]="inc.severidad === 'critica' && inc.activo"
+        (click)="toggleExpand(inc.id)"
+        [attr.aria-expanded]="incidenteExpandido() === inc.id"
+        role="button" tabindex="0">
+
+        <!-- Franja de severidad -->
+        <div class="sev-stripe" [style.background]="getColorSeveridad(inc.severidad)"></div>
+
+        <div class="inc-body">
+          <!-- Top row -->
+          <div class="inc-top">
+            <span class="inc-type-icon">{{ getIconTipo(inc.tipo) }}</span>
+            <div class="inc-meta">
+              <div class="inc-badges">
+                <span class="badge-tipo">{{ getLabelTipo(inc.tipo) }}</span>
+                <span class="badge-sev" [style.background]="getColorSeveridad(inc.severidad)">
+                  {{ getLabelSeveridad(inc.severidad) }}
+                </span>
+              </div>
+              <span class="inc-tiempo">{{ calcularTiempo(inc.fechaReporte) }}</span>
+            </div>
+            <div class="inc-estado-badge" [class.inc-estado-badge--resuelto]="!inc.activo">
+              {{ inc.activo ? '🔴 Activo' : '✅ Resuelto' }}
+            </div>
+          </div>
+
+          <!-- Título -->
+          <h2 class="inc-titulo">{{ inc.titulo }}</h2>
+
+          <!-- Rutas afectadas -->
+          @if (inc.rutasAfectadas.length > 0) {
+            <div class="inc-rutas">
+              @for (rid of inc.rutasAfectadas; track rid) {
+                <span class="ruta-tag">{{ getRutaNombre(rid) }}</span>
+              }
+            </div>
+          }
+
+          <!-- Expansión -->
+          @if (incidenteExpandido() === inc.id) {
+            <div class="inc-expanded">
+              <p class="inc-desc">{{ inc.descripcion }}</p>
+              <div class="inc-details">
+                <span class="inc-detail">
+                  <span class="inc-detail-icon">👤</span>
+                  Reportado por: {{ inc.reportadoPor }}
+                </span>
+                @if (inc.fechaResolucion) {
+                  <span class="inc-detail">
+                    <span class="inc-detail-icon">✅</span>
+                    Resuelto: {{ calcularTiempo(inc.fechaResolucion) }}
+                  </span>
+                }
+              </div>
+              @if (inc.activo) {
+                <button class="btn-resolver" (click)="resolverIncidente(inc.id, $event)" type="button">
+                  ✅ Marcar como resuelto
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </article>
+    }
+  </main>
+
+  <!-- ══ BOTTOM NAV ══════════════════════════════════════ -->
+  <nav class="bottom-nav">
+    <a routerLink="/dashboard" class="bottom-nav__item">
+      <span>🏠</span><span>Inicio</span>
+    </a>
+    <a routerLink="/tracking" class="bottom-nav__item">
+      <span>🗺️</span><span>Mapa</span>
+    </a>
+    <a routerLink="/novedades" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span>📢</span><span>Novedades</span>
+    </a>
+  </nav>
+</div>

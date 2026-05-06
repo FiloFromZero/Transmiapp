@@ -1,0 +1,72 @@
+/* ═══════════════════════════════════════════════════════════════
+   TRANSMIAPP · Global Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── CSS Reset ──────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Root tokens ────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --font-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --primary: #E84155;
+  --bg: #0d0f14;
+  --surface: #161920;
+  --text: #f1f3f9;
+  --text-muted: #8b90a0;
+  --radius: 16px;
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+html {
+  font-family: var(--font-base);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(255 255 255 / 0.15); border-radius: 999px; }
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Forms base */
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+select option {
+  background: #1e2130;
+  color: #f1f3f9;
+}
+
+/* Links */
+a { color: inherit; }
+
+/* Transitions globales animación reducida */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

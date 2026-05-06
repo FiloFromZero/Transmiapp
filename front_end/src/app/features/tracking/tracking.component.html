@@ -1,0 +1,211 @@
+<div class="tracking">
+  <!-- ══ HEADER ══════════════════════════════════════════ -->
+  <header class="track-header">
+    <a routerLink="/dashboard" class="back-btn" aria-label="Volver">←</a>
+    <div class="track-header__title">
+      @if (rutaActual()) {
+        <div class="route-pill" [style.background]="rutaActual()!.color">{{ rutaActual()!.codigo }}</div>
+        <span class="track-title">{{ rutaActual()!.nombre }}</span>
+      } @else {
+        <span class="track-title">🗺️ Mapa en vivo</span>
+      }
+    </div>
+    <div class="track-header__modes">
+      <button class="mode-btn" [class.mode-btn--active]="modoVista() === 'mapa'"
+        (click)="setModo('mapa')" type="button" aria-label="Vista mapa">🗺️</button>
+      <button class="mode-btn" [class.mode-btn--active]="modoVista() === 'lista'"
+        (click)="setModo('lista')" type="button" aria-label="Vista lista">☰</button>
+    </div>
+  </header>
+
+  <!-- ══ SELECTOR DE RUTAS ═══════════════════════════════ -->
+  <section class="route-selector" aria-label="Seleccionar ruta">
+    <div class="route-pills">
+      <button class="rpill" [class.rpill--active]="!rutaSeleccionadaId()"
+        (click)="seleccionarRuta('')" type="button">Todas</button>
+      @for (r of rutas(); track r.id) {
+        <button class="rpill" [class.rpill--active]="rutaSeleccionadaId() === r.id"
+          [style.--r-color]="r.color" (click)="seleccionarRuta(r.id)" type="button">
+          {{ r.codigo }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- ══ CUERPO PRINCIPAL ════════════════════════════════ -->
+  @if (modoVista() === 'mapa') {
+    <!-- VISTA MAPA SIMULADO -->
+    <div class="map-container" role="img" aria-label="Mapa en vivo de Transmilenio Bogotá">
+      @if (!mapaCargado()) {
+        <div class="map-skeleton">
+          <span class="skeleton-spinner">🔄</span>
+          <p>Cargando datos GPS…</p>
+        </div>
+      } @else {
+        <div class="map-canvas">
+          <!-- Grid simulando calles de Bogotá -->
+          <svg class="map-grid" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <!-- Líneas de avenidas principales -->
+            <line x1="50" y1="0" x2="50" y2="100" stroke="#1e2130" stroke-width="2.5"/>
+            <line x1="0" y1="50" x2="100" y2="50" stroke="#1e2130" stroke-width="2.5"/>
+            <line x1="25" y1="0" x2="25" y2="100" stroke="#1a1e2e" stroke-width="1"/>
+            <line x1="75" y1="0" x2="75" y2="100" stroke="#1a1e2e" stroke-width="1"/>
+            <line x1="0" y1="25" x2="100" y2="25" stroke="#1a1e2e" stroke-width="1"/>
+            <line x1="0" y1="75" x2="100" y2="75" stroke="#1a1e2e" stroke-width="1"/>
+            <!-- Troncal principal (diagonal) -->
+            <path d="M 10 90 Q 30 60 50 50 Q 70 40 90 10"
+              stroke="#E84155" stroke-width="2" fill="none" stroke-dasharray="4,2" opacity="0.5"/>
+          </svg>
+
+          <!-- Buses en el mapa -->
+          @for (pos of posicionesEnMapa(); track pos.vehiculo.id) {
+            <div class="bus-pin"
+              [class.bus-pin--selected]="vehiculoSeleccionado()?.id === pos.vehiculo.id"
+              [style.left.%]="pos.x"
+              [style.top.%]="pos.y"
+              [style.--pin-color]="rutaActual()?.color ?? '#E84155'"
+              (click)="seleccionarVehiculo(pos.vehiculo)"
+              [title]="pos.vehiculo.placa"
+              role="button" tabindex="0" [attr.aria-label]="'Bus ' + pos.vehiculo.placa">
+              🚌
+              @if (pos.vehiculo.minutosParaProximaParada !== undefined) {
+                <span class="bus-eta">{{ pos.vehiculo.minutosParaProximaParada | number:'1.0-0' }}'</span>
+              }
+            </div>
+          }
+
+          <!-- Incidentes en el mapa -->
+          @for (inc of incidentes(); track inc.id) {
+            <div class="incident-pin"
+              [class.incident-pin--critica]="inc.severidad === 'critica'"
+              [style.left.%]="35 + incidentes().indexOf(inc) * 20"
+              [style.top.%]="40 + incidentes().indexOf(inc) * 15"
+              [title]="inc.titulo">
+              ⚠️
+            </div>
+          }
+
+          <!-- Leyenda -->
+          <div class="map-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#E84155"></span>Troncal</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#FF8C00"></span>J29</span>
+            <span class="legend-item">🚌 Bus activo</span>
+            <span class="legend-item">⚠️ Incidente</span>
+          </div>
+
+          <!-- Badge de actualización -->
+          <div class="live-badge">
+            <span class="live-dot"></span>
+            EN VIVO
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- VISTA LISTA de buses -->
+    <div class="vehicle-list-header">
+      <span>{{ vehiculosOrdenados().length }} buses</span>
+      @if (rutaActual()) {
+        <span class="vl-route-badge" [style.background]="rutaActual()!.color">
+          {{ rutaActual()!.codigo }}
+        </span>
+      }
+    </div>
+  }
+
+  <!-- ══ PANEL INFERIOR: buses y paradas ════════════════ -->
+  <section class="bottom-panel">
+    <!-- Detalle del vehículo seleccionado -->
+    @if (vehiculoSeleccionado(); as v) {
+      <div class="vehicle-detail">
+        <div class="v-detail-top">
+          <div class="v-detail-info">
+            <span class="v-placa">{{ v.placa }}</span>
+            <span class="v-estado">{{ v.estado }}</span>
+          </div>
+          <button class="close-btn" (click)="seleccionarVehiculo(null)" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="v-stats">
+          <div class="v-stat">
+            <span class="vs-label">Velocidad</span>
+            <span class="vs-value">{{ v.velocidadKmh }} km/h</span>
+          </div>
+          <div class="v-stat">
+            <span class="vs-label">Dirección</span>
+            <span class="vs-value">{{ getRumboLabel(v.rumbo) }}</span>
+          </div>
+          <div class="v-stat">
+            <span class="vs-label">Próxima parada</span>
+            <span class="vs-value">{{ v.minutosParaProximaParada | number:'1.0-0' }} min</span>
+          </div>
+        </div>
+
+        <!-- Barra de ocupación -->
+        <div class="v-ocupacion">
+          <span class="v-ocu-label">
+            Ocupación: {{ v.ocupacionActual }}/{{ v.capacidadTotal }}
+            ({{ getEtiquetaOcupacion(getOcupacionPct(v)) }})
+          </span>
+          <div class="ocu-track">
+            <div class="ocu-fill"
+              [style.width.%]="getOcupacionPct(v)"
+              [style.background]="getColorOcupacion(getOcupacionPct(v))">
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Lista rápida de buses -->
+    <div class="vehicle-scroll">
+      @for (v of vehiculosOrdenados(); track v.id) {
+        <div class="vehicle-card" [class.vehicle-card--selected]="vehiculoSeleccionado()?.id === v.id"
+          (click)="seleccionarVehiculo(v)">
+          <span class="vc-icon">🚌</span>
+          <div class="vc-info">
+            <span class="vc-placa">{{ v.placa }}</span>
+            <span class="vc-eta">{{ v.minutosParaProximaParada | number:'1.0-0' }} min</span>
+          </div>
+          <div class="vc-ocu-bar">
+            <div [style.width.%]="getOcupacionPct(v)"
+              [style.background]="getColorOcupacion(getOcupacionPct(v))"
+              class="vc-ocu-fill"></div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Paradas de la ruta seleccionada -->
+    @if (rutaActual()) {
+      <div class="paradas-section">
+        <h3 class="paradas-title">Paradas</h3>
+        <div class="paradas-list">
+          @for (p of rutaActual()!.paradas; track p.id) {
+            <div class="parada-item" [class.parada-item--selected]="paradaSeleccionadaId() === p.id"
+              (click)="seleccionarParada(paradaSeleccionadaId() === p.id ? null : p.id)">
+              <span class="parada-dot" [class.parada-dot--troncal]="p.esTroncal"></span>
+              <span class="parada-nombre">{{ p.nombre }}</span>
+              @if (p.tiempoEstimadoLlegada) {
+                <span class="parada-eta">{{ p.tiempoEstimadoLlegada }}min</span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- ══ BOTTOM NAV ══════════════════════════════════════ -->
+  <nav class="bottom-nav">
+    <a routerLink="/dashboard" class="bottom-nav__item">
+      <span>🏠</span><span>Inicio</span>
+    </a>
+    <a routerLink="/tracking" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span>🗺️</span><span>Mapa</span>
+    </a>
+    <a routerLink="/novedades" class="bottom-nav__item">
+      <span>📢</span><span>Novedades</span>
+    </a>
+  </nav>
+</div>
