@@ -1,9 +1,10 @@
 import {
-  Component, inject, signal, computed, OnInit, OnDestroy, effect, PLATFORM_ID
+  Component, inject, signal, computed, OnInit, OnDestroy, PLATFORM_ID
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TransmiDataService } from '../../core/services/transmi-data.service';
+import { RoleService } from '../../core/services/role.service';
 import { Vehiculo, Ruta } from '../../core/models/transmi.models';
 import { Subscription } from 'rxjs';
 
@@ -15,9 +16,10 @@ import { Subscription } from 'rxjs';
   styleUrl: './tracking.component.scss',
 })
 export class TrackingComponent implements OnInit, OnDestroy {
-  private readonly svc       = inject(TransmiDataService);
-  private readonly route     = inject(ActivatedRoute);
+  private readonly svc        = inject(TransmiDataService);
+  private readonly route      = inject(ActivatedRoute);
   private readonly platformId = inject(PLATFORM_ID);
+  readonly roleSvc            = inject(RoleService);
 
   // ── Estado local ───────────────────────────────────────
   readonly rutaSeleccionadaId = signal<string | null>(null);

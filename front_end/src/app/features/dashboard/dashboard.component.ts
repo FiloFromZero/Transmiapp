@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TransmiDataService } from '../../core/services/transmi-data.service';
+import { RoleService } from '../../core/services/role.service';
 import { ResumenRuta } from '../../core/models/transmi.models';
 
 @Component({
@@ -13,6 +14,7 @@ import { ResumenRuta } from '../../core/models/transmi.models';
 })
 export class DashboardComponent {
   private readonly svc = inject(TransmiDataService);
+  readonly roleSvc = inject(RoleService);
 
   // ── Signals del servicio ───────────────────────────────
   readonly resumenes = this.svc.resumenesRutas;

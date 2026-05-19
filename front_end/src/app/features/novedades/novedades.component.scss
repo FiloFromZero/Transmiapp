@@ -43,10 +43,37 @@ $radius-sm: 10px;
 }
 
 .nov-title {
-  flex: 1;
   font-size: 17px;
   font-weight: 700;
   margin: 0;
+}
+
+.nov-title-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.role-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: $primary;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+
+  &--admin { color: #4CAF50; }
+}
+
+.user-info-msg {
+  font-size: 11px;
+  color: $text-muted;
+  font-style: italic;
+  margin: 8px 0 0;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  border-left: 2px solid rgba(255,255,255,0.15);
 }
 
 .report-fab {
@@ -488,7 +515,7 @@ $radius-sm: 10px;
   background: $surface;
   border-top: 1px solid $border;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 8px 0 env(safe-area-inset-bottom, 8px);
 
   &__item {

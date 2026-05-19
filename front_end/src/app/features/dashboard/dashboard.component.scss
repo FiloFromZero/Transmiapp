@@ -319,7 +319,7 @@ $shadow: 0 4px 24px rgba(0 0 0 / 0.4);
   background: $surface;
   border-top: 1px solid $border;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 8px 0 env(safe-area-inset-bottom, 8px);
   backdrop-filter: blur(12px);
 

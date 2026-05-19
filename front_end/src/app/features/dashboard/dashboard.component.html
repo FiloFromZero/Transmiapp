@@ -162,7 +162,7 @@
     }
   </main>
 
-  <!-- ══ BOTTOM NAV ═══════════════════════════════════════════ -->
+  <!-- ══ BOTTOM NAV ══════════════════════════════════════════════ -->
   <nav class="bottom-nav" aria-label="Navegación principal">
     <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
       <span class="bnav-icon">🏠</span>
@@ -176,5 +176,18 @@
       <span class="bnav-icon">📢</span>
       <span class="bnav-label">Novedades</span>
     </a>
+    
+    <!-- PATTERNS UI BY ROLE -->
+    @if (roleSvc.currentRole() === 'user') {
+      <a routerLink="/user-planner" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <span class="bnav-icon">👤</span>
+        <span class="bnav-label">Planificador</span>
+      </a>
+    } @else {
+      <a routerLink="/admin-control" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <span class="bnav-icon">🛡️</span>
+        <span class="bnav-label">Control</span>
+      </a>
+    }
   </nav>
 </div>

@@ -2,7 +2,13 @@
   <!-- ══ HEADER ══════════════════════════════════════════ -->
   <header class="nov-header">
     <a routerLink="/dashboard" class="back-btn" aria-label="Volver">←</a>
-    <h1 class="nov-title">📢 Novedades</h1>
+    <div class="nov-title-block">
+      <h1 class="nov-title">📢 Novedades</h1>
+      <span class="role-label" [class.role-label--admin]="roleSvc.currentRole() === 'admin'">
+        {{ roleSvc.currentRole() === 'admin' ? '🛡️ Administrador' : '👤 Usuario' }}
+      </span>
+    </div>
+    <!-- El botón de reporte está disponible para todos los roles -->
     <button class="report-fab" (click)="toggleFormulario()" type="button"
       [attr.aria-expanded]="mostrarFormulario()"
       [attr.aria-label]="mostrarFormulario() ? 'Cancelar reporte' : 'Reportar incidente'">
@@ -197,10 +203,13 @@
                   </span>
                 }
               </div>
-              @if (inc.activo) {
+              @if (inc.activo && roleSvc.currentRole() === 'admin') {
                 <button class="btn-resolver" (click)="resolverIncidente(inc.id, $event)" type="button">
                   ✅ Marcar como resuelto
                 </button>
+              }
+              @if (inc.activo && roleSvc.currentRole() === 'user') {
+                <p class="user-info-msg">🔐 Solo el Administrador puede resolver incidentes.</p>
               }
             </div>
           }
@@ -211,14 +220,23 @@
 
   <!-- ══ BOTTOM NAV ══════════════════════════════════════ -->
   <nav class="bottom-nav">
-    <a routerLink="/dashboard" class="bottom-nav__item">
+    <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
       <span>🏠</span><span>Inicio</span>
     </a>
-    <a routerLink="/tracking" class="bottom-nav__item">
+    <a routerLink="/tracking" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
       <span>🗺️</span><span>Mapa</span>
     </a>
     <a routerLink="/novedades" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
       <span>📢</span><span>Novedades</span>
     </a>
+    @if (roleSvc.currentRole() === 'user') {
+      <a routerLink="/user-planner" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <span>👤</span><span>Planificador</span>
+      </a>
+    } @else {
+      <a routerLink="/admin-control" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <span>🛡️</span><span>Control</span>
+      </a>
+    }
   </nav>
 </div>

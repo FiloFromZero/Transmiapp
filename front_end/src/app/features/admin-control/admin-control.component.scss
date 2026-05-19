@@ -1,0 +1,125 @@
+.admin-container {
+  padding: 1.5rem 1.5rem 100px;
+  max-width: 1000px;
+  margin: 0 auto;
+  color: var(--text);
+  min-height: 100dvh;
+
+  .admin-header {
+    margin-bottom: 2rem;
+    h2 { font-size: 2rem; color: #4CAF50; margin-bottom: 0.5rem; }
+    p { color: var(--text-muted); }
+  }
+
+  .admin-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+
+    .admin-card {
+      background: var(--surface);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.1);
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        
+        h3 { font-size: 1.2rem; color: white; }
+        .badge {
+          background: rgba(76, 175, 80, 0.2);
+          color: #4CAF50;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+      }
+
+      .description {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        label { font-weight: 500; font-size: 0.9rem; }
+        input, select {
+          padding: 0.75rem;
+          background: rgba(0,0,0,0.2);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: white;
+          border-radius: 8px;
+          &:focus { outline: none; border-color: #4CAF50; }
+        }
+      }
+
+      .actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .btn {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: 0.2s;
+        flex: 1;
+        &.btn-primary { background: #4CAF50; color: white; }
+        &.btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        &.btn-danger { background: rgba(244, 67, 54, 0.2); color: #F44336; border: 1px solid rgba(244, 67, 54, 0.5); }
+        &:hover { opacity: 0.9; transform: translateY(-1px); }
+        &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+      }
+
+      .history-log, .factory-result {
+        margin-top: 1.5rem;
+        background: rgba(0,0,0,0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        h4 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .empty-log { font-size: 0.8rem; color: #666; font-style: italic; }
+        ul {
+          list-style: none;
+          padding-left: 0;
+          font-family: monospace;
+          font-size: 0.85rem;
+          li {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            &:before { content: '> '; color: #4CAF50; }
+          }
+        }
+        p { font-family: monospace; font-size: 0.85rem; color: #4CAF50; }
+      }
+
+      .report-viewer {
+        margin-top: 1.5rem;
+        background: rgba(0,0,0,0.5);
+        padding: 1rem;
+        border-radius: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid rgba(255,255,255,0.1);
+        pre {
+          font-family: monospace;
+          font-size: 0.85rem;
+          white-space: pre-wrap;
+          color: #e0e0e0;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,124 @@
+<div class="planner-container">
+  <header class="planner-header">
+    <h2>🗺️ Planificador de Viajes</h2>
+    <p>Simulación de Patrones: Facade, Strategy y Adapter</p>
+  </header>
+
+  <div class="planner-content">
+    <div class="form-card">
+      <div class="form-group">
+        <label>Origen</label>
+        <input type="text" [ngModel]="origen()" (ngModelChange)="origen.set($event)" placeholder="Ej: Portal Norte" />
+      </div>
+      
+      <div class="form-group">
+        <label>Destino</label>
+        <input type="text" [ngModel]="destino()" (ngModelChange)="destino.set($event)" placeholder="Ej: Portal 80" />
+      </div>
+
+      <div class="form-group">
+        <label>Perfil de Usuario (Strategy)</label>
+        <select [ngModel]="userType()" (ngModelChange)="userType.set($event)">
+          <option value="NORMAL">Regular (100%)</option>
+          <option value="ESTUDIANTE">Estudiante (Descuento)</option>
+          <option value="MAYOR">Adulto Mayor (Gratis)</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" (click)="planearViaje()" [disabled]="loading()">
+          {{ loading() ? 'Calculando...' : 'Planear Viaje (Facade)' }}
+        </button>
+        <button class="btn btn-secondary" (click)="verificarTarifa()">Verificar Tarifa</button>
+      </div>
+    </div>
+
+    @if (tripResult()) {
+      <div class="result-card">
+        <h3>Resultados del Viaje</h3>
+        <div class="result-grid">
+          <div class="stat-box">
+            <span class="icon">🛣️</span>
+            <span class="label">Distancia (Adapter)</span>
+            <span class="value">{{ tripResult().distanceKm }} km</span>
+          </div>
+          <div class="stat-box">
+            <span class="icon">⏱️</span>
+            <span class="label">Tiempo Estimado</span>
+            <span class="value">{{ tripResult().estimatedMinutes }} min</span>
+          </div>
+          <div class="stat-box highlight">
+            <span class="icon">💵</span>
+            <span class="label">Tarifa Total</span>
+            <span class="value">{{ tripResult().totalFare }} {{ tripResult().currency }}</span>
+          </div>
+        </div>
+        
+        <div class="itinerary">
+          <h4>Itinerario Sugerido</h4>
+          <ul>
+            @for (step of tripResult().itinerary; track $index) {
+              <li>{{ step }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+    }
+
+    <!-- DECORATOR PATTERN CARD -->
+    <div class="form-card decorator-card">
+      <h3 style="margin-bottom:0.5rem; font-size:1.1rem;">📬 Patrón Decorator — Notificaciones</h3>
+      <p style="font-size:0.85rem; color:#8b90a0; margin-bottom:1rem;">
+        El backend apila decoradores sobre el servicio base según los canales activos (SMS, Email).
+      </p>
+      <div class="form-group">
+        <label>ID de Usuario</label>
+        <input type="text" [ngModel]="notifUserId()" (ngModelChange)="notifUserId.set($event)" />
+      </div>
+      <div class="form-group">
+        <label>Mensaje</label>
+        <input type="text" [ngModel]="notifMessage()" (ngModelChange)="notifMessage.set($event)" />
+      </div>
+      <div class="channels-row">
+        <label class="channel-toggle">
+          <input type="checkbox" [ngModel]="notifSms()" (ngModelChange)="notifSms.set($event)" />
+          <span>📱 SMS</span>
+        </label>
+        <label class="channel-toggle">
+          <input type="checkbox" [ngModel]="notifEmail()" (ngModelChange)="notifEmail.set($event)" />
+          <span>📧 Email</span>
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" (click)="enviarNotificacion()">Enviar Notificación</button>
+      </div>
+      @if (notifResult()) {
+        <div class="notif-result">
+          <p>✅ Enviado por: <strong>{{ notifResult().channels }}</strong></p>
+          <p>👤 Usuario: {{ notifResult().userId }}</p>
+          <p>🎨 Patrón: {{ notifResult().pattern }}</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ══ BOTTOM NAV ══════════════════════════════════════════════ -->
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">🏠</span>
+      <span class="bnav-label">Inicio</span>
+    </a>
+    <a routerLink="/tracking" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">🗺️</span>
+      <span class="bnav-label">Mapa</span>
+    </a>
+    <a routerLink="/novedades" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">📢</span>
+      <span class="bnav-label">Novedades</span>
+    </a>
+    <a routerLink="/user-planner" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">👤</span>
+      <span class="bnav-label">Planificador</span>
+    </a>
+  </nav>
+</div>

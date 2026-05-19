@@ -282,7 +282,7 @@ $radius: 16px;
   border-top: 1px solid $border;
   max-height: 46dvh;
   overflow-y: auto;
-  padding-bottom: 72px;
+  padding-bottom: 80px;
 }
 
 // Vehicle detail card
@@ -449,7 +449,7 @@ $radius: 16px;
   background: $surface;
   border-top: 1px solid $border;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 8px 0 env(safe-area-inset-bottom, 8px);
 
   &__item {

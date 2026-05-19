@@ -1,0 +1,142 @@
+.planner-container {
+  padding: 1.5rem 1.5rem 100px;
+  max-width: 800px;
+  margin: 0 auto;
+  color: var(--text);
+  min-height: 100dvh;
+
+  .planner-header {
+    margin-bottom: 2rem;
+    h2 { font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem; }
+    p { color: var(--text-muted); }
+  }
+
+  .planner-content {
+    display: grid;
+    gap: 2rem;
+
+    .form-card {
+      background: var(--surface);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.1);
+
+      .form-group {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        label { font-weight: 500; font-size: 0.9rem; }
+        input, select {
+          padding: 0.75rem;
+          background: rgba(0,0,0,0.2);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: white;
+          border-radius: 8px;
+          &:focus { outline: none; border-color: var(--primary); }
+        }
+      }
+
+      .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+
+        .btn {
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          border: none;
+          transition: 0.2s;
+          &.btn-primary { background: var(--primary); color: white; }
+          &.btn-secondary { background: rgba(255,255,255,0.1); color: white; }
+          &:hover { opacity: 0.9; transform: translateY(-1px); }
+          &:disabled { opacity: 0.5; cursor: not-allowed; }
+        }
+      }
+    }
+
+    .result-card {
+      background: rgba(232, 65, 85, 0.05);
+      border: 1px solid rgba(232, 65, 85, 0.2);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+
+      h3 { margin-bottom: 1rem; font-size: 1.2rem; }
+
+      .result-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+
+        .stat-box {
+          background: rgba(0,0,0,0.3);
+          padding: 1rem;
+          border-radius: 8px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 0.5rem;
+
+          .icon { font-size: 1.5rem; }
+          .label { font-size: 0.8rem; color: var(--text-muted); }
+          .value { font-size: 1.1rem; font-weight: 700; }
+
+          &.highlight {
+            background: rgba(232, 65, 85, 0.15);
+            border: 1px solid var(--primary);
+            .value { color: var(--primary); }
+          }
+        }
+      }
+
+      .itinerary {
+        h4 { margin-bottom: 0.5rem; color: var(--text-muted); }
+        ul {
+          list-style: none;
+          padding-left: 0;
+          li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            &:before { content: '📍'; margin-right: 0.5rem; }
+            &:last-child { border-bottom: none; }
+          }
+        }
+      }
+    }
+
+    .decorator-card {
+      border-color: rgba(156, 39, 176, 0.3);
+      background: rgba(156, 39, 176, 0.05);
+
+      .channels-row {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+
+        .channel-toggle {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          cursor: pointer;
+          font-size: 0.9rem;
+          input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        }
+      }
+
+      .notif-result {
+        margin-top: 1rem;
+        background: rgba(0,0,0,0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #9C27B0;
+        p { margin-bottom: 0.25rem; font-size: 0.9rem; }
+        strong { color: #9C27B0; }
+      }
+    }
+  }
+}

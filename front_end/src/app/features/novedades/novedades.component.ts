@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TransmiDataService } from '../../core/services/transmi-data.service';
+import { RoleService } from '../../core/services/role.service';
 import {
   Incidente, NuevoIncidenteDTO, TipoIncidente,
   SeveridadIncidente, Coordenada
@@ -20,6 +21,7 @@ type FiltroIncidente = 'todos' | 'activos' | 'resueltos';
 export class NovedadesComponent {
   private readonly svc = inject(TransmiDataService);
   private readonly fb  = inject(FormBuilder);
+  readonly roleSvc = inject(RoleService);
 
   // ── Estado UI ──────────────────────────────────────────
   readonly mostrarFormulario = signal<boolean>(false);

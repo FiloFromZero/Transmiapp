@@ -1,0 +1,215 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h2>🛡️ Panel de Control Administrativo</h2>
+    <p>Simulación de Patrones: Command, Template Method y Factory</p>
+  </header>
+
+  <div class="admin-grid">
+    <!-- COMMAND PATTERN -->
+    <section class="admin-card command-card">
+      <div class="card-header">
+        <h3>Patrón Command</h3>
+        <span class="badge">Asignación de Vehículos</span>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Vehículo</label>
+        <select [ngModel]="vehicleTypeCommand()" (ngModelChange)="vehicleTypeCommand.set($event)">
+          <option value="ARTICULADO">Articulado</option>
+          <option value="BIARTICULADO">Biarticulado</option>
+          <option value="ALIMENTADOR">Alimentador</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ruta Destino</label>
+        <select [ngModel]="routeCodeCommand()" (ngModelChange)="routeCodeCommand.set($event)">
+          <option value="">Selecciona una ruta...</option>
+          @for (ruta of rutasDisponibles(); track ruta.id) {
+            <option [value]="ruta.codigo">{{ ruta.codigo }} - {{ ruta.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" (click)="asignarVehiculo()">Ejecutar Comando</button>
+        <button class="btn btn-danger" (click)="deshacerAccion()" [disabled]="commandHistory().length === 0">↩ Deshacer Último</button>
+      </div>
+
+      <div class="history-log">
+        <h4>Bitácora de Comandos:</h4>
+        @if (commandHistory().length === 0) {
+          <p class="empty-log">No hay comandos ejecutados.</p>
+        }
+        <ul>
+          @for (log of commandHistory(); track $index) {
+            <li>{{ log }}</li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- TEMPLATE METHOD PATTERN -->
+    <section class="admin-card template-card">
+      <div class="card-header">
+        <h3>Patrón Template Method</h3>
+        <span class="badge">Generación de Reportes</span>
+      </div>
+      <p class="description">Descarga reportes con una estructura uniforme garantizada por el Template Method del backend.</p>
+      <div class="actions">
+        <button class="btn btn-secondary" (click)="generarReporte('pasajeros')">📊 Reporte de Pasajeros</button>
+        <button class="btn btn-secondary" (click)="generarReporte('flota')">🚌 Reporte de Flota</button>
+      </div>
+      
+      @if (reportContent()) {
+        <div class="report-viewer">
+          <pre>{{ reportContent() }}</pre>
+        </div>
+      }
+    </section>
+
+    <!-- FACTORY PATTERN -->
+    <section class="admin-card factory-card">
+      <div class="card-header">
+        <h3>Patrón Factory Method</h3>
+        <span class="badge">Inicializar Flota</span>
+      </div>
+      <div class="form-group">
+        <label>Crear instancia pura de vehículo</label>
+        <select [ngModel]="factoryVehicleType()" (ngModelChange)="factoryVehicleType.set($event)">
+          <option value="ARTICULADO">Bus Articulado</option>
+          <option value="BIARTICULADO">Bus Biarticulado</option>
+          <option value="ALIMENTADOR">Bus Alimentador</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" (click)="crearVehiculoFactory()">Instanciar en Backend</button>
+
+      @if (lastFactoryResult()) {
+        <div class="factory-result">
+          <h4>Instancia Creada:</h4>
+          <p>{{ lastFactoryResult() }}</p>
+        </div>
+      }
+    </section>
+
+    <!-- SINGLETON PATTERN -->
+    <section class="admin-card singleton-card">
+      <div class="card-header">
+        <h3>Patrón Singleton</h3>
+        <span class="badge">Configuración Global</span>
+      </div>
+      <p class="description">Verifica que el sistema siempre retorna la misma instancia de configuración (mismo hashCode).</p>
+      <button class="btn btn-primary" (click)="cargarConfig()">Leer Instancia Singleton</button>
+
+      @if (singletonConfig()) {
+        <div class="history-log">
+          <h4>Instancia del Sistema:</h4>
+          <ul>
+            <li>🏙️ Sistema: <strong>{{ singletonConfig().data }}</strong></li>
+            <li>🔑 HashCode: <code>{{ singletonConfig().hashCode }}</code></li>
+            <li>📋 Patrón: {{ singletonConfig().pattern }}</li>
+          </ul>
+          <p style="font-size:0.75rem; color:#8b90a0; margin-top:0.5rem;">
+            Presiona el botón varias veces: el HashCode siempre será igual → única instancia.
+          </p>
+        </div>
+      }
+    </section>
+
+    <!-- BUILDER PATTERN -->
+    <section class="admin-card builder-card">
+      <div class="card-header">
+        <h3>Patrón Builder</h3>
+        <span class="badge">Constructor de Rutas</span>
+      </div>
+      <div class="form-group">
+        <label>Código</label>
+        <input type="text" [ngModel]="builderCode()" (ngModelChange)="builderCode.set($event)" placeholder="Ej: B99" />
+      </div>
+      <div class="form-group">
+        <label>Nombre de la Ruta</label>
+        <input type="text" [ngModel]="builderName()" (ngModelChange)="builderName.set($event)" />
+      </div>
+      <div class="form-group">
+        <label>Origen</label>
+        <input type="text" [ngModel]="builderOrigin()" (ngModelChange)="builderOrigin.set($event)" />
+      </div>
+      <div class="form-group">
+        <label>Destino</label>
+        <input type="text" [ngModel]="builderDestination()" (ngModelChange)="builderDestination.set($event)" />
+      </div>
+      <div class="form-group" style="flex-direction:row; align-items:center; gap:1rem">
+        <label>¿Ruta Expresa?</label>
+        <input type="checkbox" [ngModel]="builderExpress()" (ngModelChange)="builderExpress.set($event)" />
+      </div>
+      <button class="btn btn-primary" (click)="construirRuta()">Construir Ruta (Builder)</button>
+
+      @if (builderResult()) {
+        <div class="history-log">
+          <h4>Ruta Construida:</h4>
+          <ul>
+            <li>🚌 Patrón: {{ builderResult().pattern }}</li>
+            <li>🛣️ Ruta: {{ builderResult().route }}</li>
+            <li>📍 Paradas: {{ builderResult().stations?.join(' → ') }}</li>
+            <li>⏱️ Frecuencia: {{ builderResult().frequency }}</li>
+          </ul>
+        </div>
+      }
+    </section>
+
+    <!-- OBSERVER PATTERN -->
+    <section class="admin-card observer-card">
+      <div class="card-header">
+        <h3>Patrón Observer</h3>
+        <span class="badge">Notificador de Eventos</span>
+      </div>
+      <p class="description">Simula la llegada de un bus a una estación. El backend notifica a todos los observadores suscritos.</p>
+      <div class="form-group">
+        <label>Estación</label>
+        <input type="text" [ngModel]="observerStation()" (ngModelChange)="observerStation.set($event)" placeholder="Ej: Portal Norte" />
+      </div>
+      <div class="form-group">
+        <label>Ruta del Bus</label>
+        <select [ngModel]="observerRoute()" (ngModelChange)="observerRoute.set($event)">
+          <option value="">Selecciona una ruta...</option>
+          @for (ruta of rutasDisponibles(); track ruta.id) {
+            <option [value]="ruta.codigo">{{ ruta.codigo }} - {{ ruta.nombre }}</option>
+          }
+        </select>
+      </div>
+      <button class="btn btn-primary" (click)="notificarLlegada()" [disabled]="!observerStation() || !observerRoute()">
+        🔔 Disparar Evento de Llegada
+      </button>
+
+      <div class="history-log">
+        <h4>Log de Eventos (Observer):</h4>
+        @if (observerEventLog().length === 0) {
+          <p class="empty-log">Sin eventos aún. Simula una llegada.</p>
+        }
+        <ul>
+          @for (entry of observerEventLog(); track $index) {
+            <li>{{ entry }}</li>
+          }
+        </ul>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ══ BOTTOM NAV ══════════════════════════════════════════════ -->
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">🏠</span>
+      <span class="bnav-label">Inicio</span>
+    </a>
+    <a routerLink="/tracking" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">🗺️</span>
+      <span class="bnav-label">Mapa</span>
+    </a>
+    <a routerLink="/novedades" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">📢</span>
+      <span class="bnav-label">Novedades</span>
+    </a>
+    <a routerLink="/admin-control" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+      <span class="bnav-icon">🛡️</span>
+      <span class="bnav-label">Control</span>
+    </a>
+  </nav>
+</div>

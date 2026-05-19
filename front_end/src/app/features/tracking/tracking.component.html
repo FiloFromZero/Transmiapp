@@ -198,14 +198,23 @@
 
   <!-- ══ BOTTOM NAV ══════════════════════════════════════ -->
   <nav class="bottom-nav">
-    <a routerLink="/dashboard" class="bottom-nav__item">
+    <a routerLink="/dashboard" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
       <span>🏠</span><span>Inicio</span>
     </a>
     <a routerLink="/tracking" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
       <span>🗺️</span><span>Mapa</span>
     </a>
-    <a routerLink="/novedades" class="bottom-nav__item">
+    <a routerLink="/novedades" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
       <span>📢</span><span>Novedades</span>
     </a>
+    @if (roleSvc.currentRole() === 'user') {
+      <a routerLink="/user-planner" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <span>👤</span><span>Planificador</span>
+      </a>
+    } @else {
+      <a routerLink="/admin-control" routerLinkActive="bottom-nav__item--active" class="bottom-nav__item">
+        <span>🛡️</span><span>Control</span>
+      </a>
+    }
   </nav>
 </div>

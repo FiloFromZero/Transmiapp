@@ -25,6 +25,18 @@ export const routes: Routes = [
     title: 'Novedades · TransmiApp',
   },
   {
+    path: 'user-planner',
+    loadComponent: () =>
+      import('./features/user-planner/user-planner.component').then(m => m.UserPlannerComponent),
+    title: 'Planificador · TransmiApp',
+  },
+  {
+    path: 'admin-control',
+    loadComponent: () =>
+      import('./features/admin-control/admin-control.component').then(m => m.AdminControlComponent),
+    title: 'Control Administrativo · TransmiApp',
+  },
+  {
     path: '**',
     redirectTo: 'dashboard',
   },
